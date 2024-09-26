@@ -1,0 +1,265 @@
+openapi: 3.0.0
+info:
+  title: Bike Shop API
+  description: API для управления складом велосипедов и категориями
+
+paths:
+  /categories:
+    get:
+      summary: Получить список всех категорий
+      responses:
+        '200':
+          description: Список категорий
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+    post:
+      summary: Создать новую категорию
+      requestBody:
+        description: Объект новой категории
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryCreate'
+      responses:
+        '201':
+          description: Категория успешно создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+
+  /categories/{category_id}:
+    get:
+      summary: Получить информацию о категории по её ID
+      parameters:
+        - name: category_id
+          in: path
+          required: true
+          description: ID категории
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Категория найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '404':
+          description: Категория не найдена
+
+    put:
+      summary: Обновить информацию о категории
+      parameters:
+        - name: category_id
+          in: path
+          required: true
+          description: ID категории
+          schema:
+            type: integer
+      requestBody:
+        description: Объект с обновлёнными данными категории
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryUpdate'
+      responses:
+        '200':
+          description: Информация о категории успешно обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '404':
+          description: Категория не найдена
+
+    delete:
+      summary: Удалить категорию по её ID
+      parameters:
+        - name: category_id
+          in: path
+          required: true
+          description: ID категории
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Категория успешно удалена
+        '404':
+          description: Категория не найдена
+
+  /bikes:
+    get:
+      summary: Получить список всех велосипедов
+      responses:
+        '200':
+          description: Список велосипедов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Bike'
+    post:
+      summary: Добавить новый велосипед
+      requestBody:
+        description: Объект нового велосипеда
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BikeCreate'
+      responses:
+        '201':
+          description: Велосипед успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bike'
+
+  /bikes/{bike_id}:
+    get:
+      summary: Получить информацию о велосипеде по его ID
+      parameters:
+        - name: bike_id
+          in: path
+          required: true
+          description: ID велосипеда
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Велосипед найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bike'
+        '404':
+          description: Велосипед не найден
+
+    put:
+      summary: Обновить информацию о велосипеде
+      parameters:
+        - name: bike_id
+          in: path
+          required: true
+          description: ID велосипеда
+          schema:
+            type: integer
+      requestBody:
+        description: Объект с обновлёнными данными велосипеда
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BikeUpdate'
+      responses:
+        '200':
+          description: Информация о велосипеде успешно обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bike'
+        '404':
+          description: Велосипед не найден
+
+    delete:
+      summary: Удалить велосипед по его ID
+      parameters:
+        - name: bike_id
+          in: path
+          required: true
+          description: ID велосипеда
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Велосипед успешно удалён
+        '404':
+          description: Велосипед не найден
+
+components:
+  schemas:
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Горный
+
+    CategoryCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Горный
+
+    CategoryUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Горный
+
+    Bike:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Trek 820
+        price:
+          type: number
+          format: float
+          example: 500.00
+        stock:
+          type: integer
+          example: 10
+        category:
+          type: string
+          example: Горный
+
+    BikeCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Trek 820
+        price:
+          type: number
+          format: float
+          example: 500.00
+        stock:
+          type: integer
+          example: 10
+        category_id:
+          type: integer
+          example: 1
+
+    BikeUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Trek 820
+        price:
+          type: number
+          format: float
+          example: 500.00
+        stock:
+          type: integer
+          example: 10
+        category_id:
+          type: integer
+          example: 1
