@@ -55,7 +55,7 @@ trace_provider = TracerProvider(resource=resource)
 trace.set_tracer_provider(trace_provider)
 
 otlp_exporter = OTLPSpanExporter(
-    endpoint="http://localhost:4318/v1/traces",  # Убедитесь, что путь "/v1/traces" указан
+    endpoint="http://localhost:4318/v1/traces",
     headers={}
 )
 span_processor = BatchSpanProcessor(otlp_exporter)
