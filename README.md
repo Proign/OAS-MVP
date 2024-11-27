@@ -14,6 +14,8 @@
 
 ![Grafana logs](https://github.com/Proign/OAS-MVP/blob/main/screenshots/screenshot-logs.png)
 
+![Grafana logql](https://github.com/Proign/OAS-MVP/blob/main/screenshots/screenshot-logql-logs.png)
+
 # Grafana - Трейсы
 
 ![Grafana logs](https://github.com/Proign/OAS-MVP/blob/main/screenshots/screenshot-traces.png)
