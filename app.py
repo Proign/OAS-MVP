@@ -32,14 +32,18 @@ logger = logging.getLogger("bikeshop")
 
 
 # Настройка метрик Prometheus
-request_count = Counter('bikeshop_requests_total', 'Total number of requests')
-request_latency = Histogram('bikeshop_request_latency_seconds', 'Request latency in seconds')
-response_size = Histogram('bikeshop_response_size_bytes', 'Response size in bytes')
+request_count = Counter('bikeshop_requests_total', 
+                        'Total number of requests')
+request_latency = Histogram('bikeshop_request_latency_seconds', 
+                            'Request latency in seconds')
+response_size = Histogram('bikeshop_response_size_bytes', 
+                          'Response size in bytes')
 
 
 @app.route('/metrics')
 def metrics_endpoint():
-    return generate_latest(), 200, {'Content-Type': 'text/plain; version=0.0.4; charset=utf-8'}
+    return generate_latest(), 200, {'Content-Type': 
+                                    'text/plain; version=0.0.4; charset=utf-8'}
 
 
 # Swagger UI
@@ -196,9 +200,9 @@ def get_bikes():
 def create_bike():
     data = request.json
     category = Category.query.get_or_404(data['category_id'])
-    new_bike = Bike(name=data['name'], 
-                    price=data['price'], 
-                    stock=data['stock'], 
+    new_bike = Bike(name=data['name'],
+                    price=data['price'],
+                    stock=data['stock'],
                     category_id=category.id)
     db.session.add(new_bike)
     db.session.commit()
