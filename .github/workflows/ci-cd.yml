@@ -60,5 +60,10 @@ jobs:
       - name: Build and run with Docker Compose
         run: docker-compose up --build -d
 
-      - name: Verify service is running
-        run: curl -i http://localhost:5000
+      - name: Wait for service to be ready
+        run: |
+          for i in {1..20}; do
+            curl -f http://localhost:5000 && break
+            echo "Waiting for service to be ready... ($i)"
+            sleep 1
+          done
