@@ -13,41 +13,53 @@ import os
 import time
 import logging
 
+
 # Инициализация приложения Flask
 app = Flask(__name__)
 
+
 # Настройки базы данных SQLite
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'bikeshop.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
+    os.path.join(basedir, 'bikeshop.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
 
 # Настройка логирования
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("bikeshop")
+
 
 # Настройка метрик Prometheus
 request_count = Counter('bikeshop_requests_total', 'Total number of requests')
 request_latency = Histogram('bikeshop_request_latency_seconds', 'Request latency in seconds')
 response_size = Histogram('bikeshop_response_size_bytes', 'Response size in bytes')
 
+
 @app.route('/metrics')
 def metrics_endpoint():
     return generate_latest(), 200, {'Content-Type': 'text/plain; version=0.0.4; charset=utf-8'}
 
+
 # Swagger UI
 SWAGGER_URL = '/swagger'
 API_URL = '/static/openapi.yaml'
-swaggerui_blueprint = get_swaggerui_blueprint(SWAGGER_URL, API_URL, config={'app_name': "Bike Shop API"})
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL, API_URL, config={'app_name': "Bike Shop API"}
+)
 app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+
 
 @app.route('/')
 def index():
     return redirect('/swagger')
 
+
 @app.route('/static/<path:path>')
 def send_spec(path):
     return send_from_directory('static', path)
+
 
 # OpenTelemetry: настройка трейсинга
 resource = Resource(attributes={"service.name": "bikeshop"})
@@ -63,11 +75,13 @@ trace_provider.add_span_processor(span_processor)
 
 tracer = trace.get_tracer(__name__)
 
+
 # Инструментирование Flask и SQLAlchemy
 FlaskInstrumentor().instrument_app(app)
 
 with app.app_context():  # Устанавливаем контекст приложения
     SQLAlchemyInstrumentor().instrument(engine=db.engine)
+
 
 # Модели базы данных
 class Category(db.Model):
@@ -76,6 +90,7 @@ class Category(db.Model):
 
     def to_dict(self):
         return {"id": self.id, "name": self.name}
+
 
 class Bike(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -94,9 +109,11 @@ class Bike(db.Model):
             "category": self.category.name
         }
 
+
 # Инициализация базы данных
 with app.app_context():
     db.create_all()
+
 
 # Обертка для измерения времени выполнения
 def time_request(func):
@@ -115,6 +132,7 @@ def time_request(func):
     wrapper.__name__ = func.__name__
     return wrapper
 
+
 # CRUD для категорий
 @app.route('/categories', methods=['GET'])
 @time_request
@@ -122,6 +140,7 @@ def get_categories():
     categories = Category.query.all()
     logger.info("Fetched all categories.")
     return jsonify([c.to_dict() for c in categories])
+
 
 @app.route('/categories', methods=['POST'])
 @time_request
@@ -133,12 +152,14 @@ def create_category():
     logger.info(f"Category created: {new_category.name}")
     return jsonify(new_category.to_dict()), 201
 
+
 @app.route('/categories/<int:category_id>', methods=['GET'])
 @time_request
 def get_category(category_id):
     category = Category.query.get_or_404(category_id)
     logger.info(f"Fetched category: {category.name}")
     return jsonify(category.to_dict())
+
 
 @app.route('/categories/<int:category_id>', methods=['PUT'])
 @time_request
@@ -150,6 +171,7 @@ def update_category(category_id):
     logger.info(f"Updated category {category_id}: {category.name}")
     return jsonify(category.to_dict())
 
+
 @app.route('/categories/<int:category_id>', methods=['DELETE'])
 @time_request
 def delete_category(category_id):
@@ -159,6 +181,7 @@ def delete_category(category_id):
     logger.info(f"Deleted category {category_id}.")
     return '', 204
 
+
 # CRUD для велосипедов
 @app.route('/bikes', methods=['GET'])
 @time_request
@@ -167,16 +190,21 @@ def get_bikes():
     logger.info("Fetched all bikes.")
     return jsonify([b.to_dict() for b in bikes])
 
+
 @app.route('/bikes', methods=['POST'])
 @time_request
 def create_bike():
     data = request.json
     category = Category.query.get_or_404(data['category_id'])
-    new_bike = Bike(name=data['name'], price=data['price'], stock=data['stock'], category_id=category.id)
+    new_bike = Bike(name=data['name'], 
+                    price=data['price'], 
+                    stock=data['stock'], 
+                    category_id=category.id)
     db.session.add(new_bike)
     db.session.commit()
     logger.info(f"Bike created: {new_bike.name}")
     return jsonify(new_bike.to_dict()), 201
+
 
 @app.route('/bikes/<int:bike_id>', methods=['GET'])
 @time_request
@@ -184,6 +212,7 @@ def get_bike(bike_id):
     bike = Bike.query.get_or_404(bike_id)
     logger.info(f"Fetched bike: {bike.name}")
     return jsonify(bike.to_dict())
+
 
 @app.route('/bikes/<int:bike_id>', methods=['PUT'])
 @time_request
@@ -200,6 +229,7 @@ def update_bike(bike_id):
     logger.info(f"Updated bike {bike_id}: {bike.name}")
     return jsonify(bike.to_dict())
 
+
 @app.route('/bikes/<int:bike_id>', methods=['DELETE'])
 @time_request
 def delete_bike(bike_id):
@@ -208,6 +238,7 @@ def delete_bike(bike_id):
     db.session.commit()
     logger.info(f"Deleted bike {bike_id}.")
     return '', 204
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
