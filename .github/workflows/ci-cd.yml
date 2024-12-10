@@ -61,4 +61,4 @@ jobs:
         run: docker-compose up --build -d
 
       - name: Verify service is running
-        run: curl -f http://localhost:5000
+        run: curl -f http://localhost:5000/bikes
