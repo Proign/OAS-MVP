@@ -1,6 +1,6 @@
 flask==2.3.3
 flask_sqlalchemy==3.0.5
-flask_swagger_ui==4.12
+flask_swagger_ui==4.11.1
 prometheus_client==0.17.1
 opentelemetry-api==1.18.0
 opentelemetry-sdk==1.18.0
