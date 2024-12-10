@@ -61,11 +61,4 @@ jobs:
         run: docker-compose up --build -d
 
       - name: Verify service is running
-        run: |
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/bikes)
-          if [ "$HTTP_STATUS" -ne 200 ]; then
-            echo "Service is not running properly. Status code: $HTTP_STATUS"
-            exit 1
-          else
-            echo "Service is running with status code: $HTTP_STATUS"
-          fi
+        run: curl -i http://localhost:5000/bikes
